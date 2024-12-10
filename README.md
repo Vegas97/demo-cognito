@@ -32,13 +32,12 @@ npm install
 
 3. Create a `.env.local` file in the root directory with the following structure:
 ```env
-NEXT_PUBLIC_USER_POOL_ID=your-user-pool-id
-NEXT_PUBLIC_APP_CLIENT_ID=your-app-client-id
-NEXT_PUBLIC_REGION=your-aws-region
-NEXT_PUBLIC_DOMAIN=your-cognito-domain-prefix
-
+NEXT_PUBLIC_COGNITO_USER_POOL_ID=your-user-pool-id
+NEXT_PUBLIC_COGNITO_APP_CLIENT_ID=[APP_CLIENT_ID]
+NEXT_PUBLIC_COGNITO_REGION=your-aws-region
+NEXT_PUBLIC_COGNITO_DOMAIN=your-cognito-domain-prefix
 NEXT_PUBLIC_COGNITO_AUTHORITY=https://cognito-idp.[REGION].amazonaws.com/[USER_POOL_ID]
-NEXT_PUBLIC_COGNITO_CLIENT_ID=[APP_CLIENT_ID]
+
 NEXT_PUBLIC_COGNITO_REDIRECT_URI=http://localhost:3000
 ```
 
