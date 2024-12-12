@@ -1,6 +1,6 @@
 // const DOMAIN_URL = `https://${process.env.NEXT_PUBLIC_COGNITO_DOMAIN}.auth.${process.env.NEXT_PUBLIC_COGNITO_REGION}.amazoncognito.com`;
 const DOMAIN_URL = process.env.NEXT_PUBLIC_COGNITO_DOMAIN;
-const REDIRECT_URI = 'http://localhost:3000';
+const REDIRECT_URI = process.env.NEXT_PUBLIC_COGNITO_REDIRECT_URI;
 const CLIENT_ID = process.env.NEXT_PUBLIC_COGNITO_APP_CLIENT_ID;
 
 export const authConfig = {
@@ -9,7 +9,7 @@ export const authConfig = {
   redirect_uri: REDIRECT_URI,
   post_logout_redirect_uri: REDIRECT_URI,
   response_type: 'code',
-  scope: 'openid profile email',
+  scope: process.env.NEXT_PUBLIC_COGNITO_SCOPE || 'openid email profile',
   loadUserInfo: true,
   
   // Additional OIDC settings

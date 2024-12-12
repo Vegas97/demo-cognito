@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { AuthProvider } from "@/auth/auth-provider"; // Make sure to replace with the actual path to AuthProvider
+import { AuthProvider } from "@/auth/auth-provider"; 
+import { DebugPanel } from "@/components/DebugPanel";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -26,8 +27,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
-        <AuthProvider>{children}</AuthProvider>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <AuthProvider>
+          <div className="flex min-h-screen">
+            <div className="w-[60%] border-r border-gray-200">
+              {children}
+            </div>
+            <div className="w-[40%] overflow-y-auto">
+              <DebugPanel />
+            </div>
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );
