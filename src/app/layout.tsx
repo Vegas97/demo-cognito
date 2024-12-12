@@ -30,10 +30,10 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <AuthProvider>
           <div className="flex min-h-screen">
-            <div className="w-[60%] border-r border-gray-200">
+            <div className="w-[55%] border-r border-gray-200">
               {children}
             </div>
-            <div className="w-[40%] overflow-y-auto">
+            <div className="w-[45%] overflow-y-auto">
               <DebugPanel />
             </div>
           </div>

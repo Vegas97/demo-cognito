@@ -11,6 +11,9 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { JsonView, darkStyles, defaultStyles } from 'react-json-view-lite';
+import 'react-json-view-lite/dist/index.css';
+import { useState } from 'react';
 
 const jsonTheme = {
   scheme: 'monokai',
@@ -34,6 +37,12 @@ const jsonTheme = {
 
 export function DebugPanel() {
   const auth = useAuth();
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const shouldExpandNode = (level: number) => {
+    if (isExpanded) return true;
+    return level === 0; // Only expand first level by default
+  };
 
   return (
     <div className="h-full overflow-hidden">
@@ -116,10 +125,22 @@ export function DebugPanel() {
                           Full authentication state and user information
                         </DrawerDescription>
                       </DrawerHeader>
+                      <div className="px-4">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setIsExpanded(!isExpanded)}
+                          className="w-full mb-2"
+                        >
+                          {isExpanded ? 'Collapse All' : 'Expand All'}
+                        </Button>
+                      </div>
                       <div className="p-4 bg-gray-900 rounded-lg overflow-auto max-h-[500px] mx-4">
-                        <pre className="text-green-400 text-sm font-mono whitespace-pre-wrap">
-                          {JSON.stringify(auth, null, 2)}
-                        </pre>
+                        <JsonView 
+                          data={auth} 
+                          style={darkStyles}
+                          shouldExpandNode={shouldExpandNode}
+                        />
                       </div>
                       <div className="p-4 mt-2 flex justify-end">
                         <DrawerClose asChild>
