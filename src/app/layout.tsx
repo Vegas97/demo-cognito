@@ -2,7 +2,6 @@
 
 import localFont from "next/font/local";
 import "./globals.css";
-import { AuthProvider } from "@/auth/auth-provider"; 
 import { ResizableLayout } from "@/components/ResizableLayout";
 
 const geistSans = localFont({
@@ -25,11 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <AuthProvider>
+        
           <ResizableLayout>
             {children}
           </ResizableLayout>
-        </AuthProvider>
+        
       </body>
     </html>
   );
