@@ -1,18 +1,18 @@
 'use client';
 
 // import { useAuth } from '@/auth/use-auth';
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
-import { JsonView, darkStyles } from 'react-json-view-lite';
-import 'react-json-view-lite/dist/index.css';
+// import {
+//   Drawer,
+//   DrawerClose,
+//   DrawerContent,
+//   DrawerDescription,
+//   DrawerHeader,
+//   DrawerTitle,
+//   DrawerTrigger,
+// } from "@/components/ui/drawer";
+// import { Button } from "@/components/ui/button";
+// import { JsonView, darkStyles } from 'react-json-view-lite';
+// import 'react-json-view-lite/dist/index.css';
 import { useState } from 'react';
 
 export function DebugPanel() {
