@@ -1,0 +1,5 @@
+GUIDELINE[code_quality]:After making any code changes, automatically run the check script (npm run check) to verify both linting and TypeScript type checking pass without errors. Report any issues found and offer to fix them. if scripts are not present add them.
+("lint": "next lint",)
+("typecheck": "tsc --noEmit",)
+("check": "npm run lint || true && npm run typecheck")
+
