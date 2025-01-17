@@ -167,9 +167,35 @@ export function DebugPanel() {
                   <p className="text-gray-600">Role:</p>
                   <p className="break-all">{session.role || 'N/A'}</p>
                   <p className="text-gray-600">Groups:</p>
-                  <p className="break-all">{session.profile?.groups?.join(', ') || 'N/A'}</p>
-                  <p className="text-gray-600">Realm Roles:</p>
-                  <p className="break-all">{session.profile?.realm_access?.roles?.join(', ') || 'N/A'}</p>
+                  <div className="text-sm font-mono bg-gray-50 p-2 rounded-md">
+                    {session.profile?.groups?.sort()?.map((group, index) => (
+                      <div key={index} className="text-gray-800">
+                        {group}
+                      </div>
+                    )) || 'N/A'}
+                  </div>
+                  <p className="text-gray-600">Custom Roles:</p>
+                  <div className="text-sm font-mono bg-gray-50 p-2 rounded-md max-h-40 overflow-y-auto">
+                    {session.profile?.realm_access?.roles
+                      ?.filter(role => role.startsWith('ROLE_'))
+                      ?.sort()
+                      ?.map((role, index) => (
+                        <div key={index} className="text-gray-800">
+                          {role}
+                        </div>
+                      )) || 'N/A'}
+                  </div>
+                  <p className="text-gray-600">System Roles:</p>
+                  <div className="text-sm font-mono bg-gray-50 p-2 rounded-md max-h-40 overflow-y-auto">
+                    {session.profile?.realm_access?.roles
+                      ?.filter(role => !role.startsWith('ROLE_'))
+                      ?.sort()
+                      ?.map((role, index) => (
+                        <div key={index} className="text-gray-800">
+                          {role}
+                        </div>
+                      )) || 'N/A'}
+                  </div>
                   <p className="text-gray-600">Provider:</p>
                   <p className="break-all">{session.provider || 'N/A'}</p>
                   <p className="text-gray-600">Provider ID:</p>

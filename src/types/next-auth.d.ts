@@ -12,6 +12,8 @@ declare module "next-auth" {
     providerAccountId?: string;
     userId?: string;
     role?: string;
+    realmRoles?: string[];
+    groups?: string[];
     profile?: {
       sub?: string;
       email_verified?: boolean;
