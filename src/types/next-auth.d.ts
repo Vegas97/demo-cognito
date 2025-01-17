@@ -10,11 +10,7 @@ declare module "next-auth" {
     expiresAt?: number;
     scope?: string;
     providerAccountId?: string;
-    userId?: string;
     sessionState?: string;
-    role?: string;
-    realmRoles?: string[];
-    groups?: string[];
     profile?: {
       sub?: string;
       email_verified?: boolean;
@@ -23,7 +19,6 @@ declare module "next-auth" {
       given_name?: string;
       family_name?: string;
       email?: string;
-      // Keycloak specific claims
       realm_access?: {
         roles?: string[];
       };
@@ -42,8 +37,14 @@ declare module "next-auth" {
       [key: string]: unknown;
     };
     user: {
-      id?: string;
-      role?: string;
+      id: string;
+      name: string;
+      email: string;
+      profileAccess: string;
+      roles: string[];
+      username: string;
+      emailVerified: boolean;
+      image?: string | null;
     } & DefaultSession["user"];
   }
 

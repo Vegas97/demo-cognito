@@ -73,6 +73,16 @@ export default {
     async session({ session, token }) {
       return {
         ...session,
+        user: {
+          id: token.userId,
+          name: token.profile?.name || '',
+          email: token.profile?.email || '',
+          profileAccess: token.groups?.[0]?.replace('/', '') || '',
+          roles: token.realmRoles?.filter(role => role.startsWith('ROLE_')) || [],
+          username: token.profile?.preferred_username || '',
+          emailVerified: token.profile?.email_verified || false,
+          image: session.user?.image,
+        },
         provider: token.provider,
         accessToken: token.accessToken,
         idToken: token.idToken,
@@ -81,12 +91,8 @@ export default {
         expiresAt: token.expiresAt,
         scope: token.scope,
         providerAccountId: token.providerAccountId,
-        userId: token.userId,
         sessionState: token.sessionState,
         profile: token.profile,
-        realmRoles: token.realmRoles,
-        groups: token.groups,
-        role: token.role,
       };
     },
   },
