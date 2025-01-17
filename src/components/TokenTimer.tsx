@@ -10,18 +10,36 @@ interface TimerProps {
 }
 
 function formatTimeLeft(timeLeft: number): string {
-  if (timeLeft <= 0) return 'Expired';
-  
-  const hours = Math.floor(timeLeft / 3600);
-  const minutes = Math.floor((timeLeft % 3600) / 60);
-  const seconds = Math.floor(timeLeft % 60);
+  const formatTime = (seconds: number) => {
+    if (seconds <= 0) return "Expired";
 
-  const parts = [];
-  if (hours > 0) parts.push(`${hours}h`);
-  if (minutes > 0) parts.push(`${minutes}m`);
-  parts.push(`${seconds}s`);
+    const years = Math.floor(seconds / (365 * 24 * 3600));
+    const months = Math.floor((seconds % (365 * 24 * 3600)) / (30 * 24 * 3600));
+    const days = Math.floor((seconds % (30 * 24 * 3600)) / (24 * 3600));
+    const hours = Math.floor((seconds % (24 * 3600)) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
 
-  return parts.join(' ');
+    const parts = [];
+
+    if (years > 0) {
+      parts.push(`${years}Y ${months}M ${days}D ${hours}h ${minutes}m ${remainingSeconds}s`);
+    } else if (months > 0) {
+      parts.push(`${months}M ${days}D ${hours}h ${minutes}m ${remainingSeconds}s`);
+    } else if (days > 0) {
+      parts.push(`${days}D ${hours}h ${minutes}m ${remainingSeconds}s`);
+    } else if (hours > 0) {
+      parts.push(`${hours}h ${minutes}m ${remainingSeconds}s`);
+    } else if (minutes > 0) {
+      parts.push(`${minutes}m ${remainingSeconds}s`);
+    } else {
+      parts.push(`${remainingSeconds}s`);
+    }
+
+    return parts.join(" ");
+  };
+
+  return formatTime(timeLeft);
 }
 
 function ExpirationTimer({ expiresAt, label, token }: TimerProps) {
@@ -36,7 +54,11 @@ function ExpirationTimer({ expiresAt, label, token }: TimerProps) {
       const timeLeft = Math.max(0, expiresAt - now);
       
       // Debug information
-      setDebug(`Now: ${now} (${new Date(now * 1000).toISOString()}), ExpiresAt: ${expiresAt} (${new Date(expiresAt * 1000).toISOString()}), Diff: ${timeLeft}s`);
+      setDebug(
+        `Now: ${now} (${new Date(now * 1000).toISOString()})\n` +
+        `ExpiresAt: ${expiresAt} (${new Date(expiresAt * 1000).toISOString()})\n` +
+        `Diff: ${timeLeft}s`
+      );
       
       return timeLeft;
     };
