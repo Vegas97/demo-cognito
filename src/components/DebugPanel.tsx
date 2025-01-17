@@ -1,37 +1,98 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import {
   Drawer,
   DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { JsonView, darkStyles } from 'react-json-view-lite';
-import 'react-json-view-lite/dist/index.css';
-import { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { JsonView } from "react-json-view-lite";
+import "react-json-view-lite/dist/index.css";
 import { publicRoutes, authRoutes, apiAuthPrefix } from '@/routes';
+
+const darkStyles = {
+  container: "bg-gray-900 text-gray-100",
+  basicChildStyle: "whitespace-pre-wrap break-all pl-6",
+  label: "text-blue-300",
+  nullValue: "text-gray-500",
+  stringValue: "text-green-300",
+  numberValue: "text-yellow-300",
+  booleanValue: "text-purple-300",
+  objectBrace: "text-blue-200 font-medium",
+  arrayBracket: "text-blue-200 font-medium",
+  comma: "text-blue-200",
+  colon: "text-blue-200",
+};
+
+const customStyles = `
+  .react-json-view-lite {
+    padding-left: 1rem;
+  }
+  .react-json-view-lite-node {
+    position: relative;
+  }
+  .react-json-view-lite-node::before {
+    content: '';
+    position: absolute;
+    left: -1rem;
+    top: 0.7rem;
+    height: calc(100% - 1rem);
+    width: 1px;
+    background-color: rgb(75, 85, 99);
+  }
+  .react-json-view-lite-node:last-child::before {
+    height: 0;
+  }
+  .react-json-view-lite-node::after {
+    content: '';
+    position: absolute;
+    left: -1rem;
+    top: 0.7rem;
+    width: 0.75rem;
+    height: 1px;
+    background-color: rgb(75, 85, 99);
+  }
+  .react-json-view-lite-arrow {
+    color: rgb(147, 197, 253) !important;
+    font-size: 0.8rem !important;
+    margin-right: 0.5rem !important;
+    transition: transform 0.2s ease;
+  }
+  .react-json-view-lite-arrow.react-json-view-lite-arrow-collapsed {
+    transform: rotate(-90deg);
+  }
+  .react-json-view-lite-arrow:hover {
+    color: rgb(59, 130, 246) !important;
+  }
+`;
 
 export function DebugPanel() {
   const { data: session, status } = useSession();
-  const [isExpanded, setIsExpanded] = useState(true); // Set to true by default
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [copiedToken, setCopiedToken] = useState<string | null>(null);
   const pathname = usePathname();
 
   const getRouteType = (path: string) => {
-    if (path.startsWith(apiAuthPrefix)) return 'API Auth Route';
-    if (publicRoutes.includes(path)) return 'Public Route';
-    if (authRoutes.includes(path)) return 'Auth Route';
-    return 'Protected Route';
+    if (path.startsWith(apiAuthPrefix)) return "API Auth";
+    if (publicRoutes.includes(path)) return "Public";
+    if (authRoutes.includes(path)) return "Auth";
+    return "Protected";
   };
 
-  const shouldExpandNode = (level: number) => {
-    if (isExpanded) return true;
-    return level === 0; // Only expand first level by default
+  const handleCopyToken = (token: string, type: string) => {
+    navigator.clipboard.writeText(token);
+    setCopiedToken(type);
+    setTimeout(() => setCopiedToken(null), 2000);
+  };
+
+  const shouldExpandNode = () => {
+    return true; // Always expand nodes
   };
 
   return (
@@ -46,11 +107,11 @@ export function DebugPanel() {
               <p className="text-gray-600">Route Type:</p>
               <p>
                 <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
-                  getRouteType(pathname) === 'Protected Route' 
+                  getRouteType(pathname) === 'Protected' 
                     ? 'bg-green-50 text-green-800 ring-1 ring-inset ring-green-600/20' 
-                    : getRouteType(pathname) === 'Public Route'
+                    : getRouteType(pathname) === 'Public'
                     ? 'bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-600/20'
-                    : getRouteType(pathname) === 'Auth Route'
+                    : getRouteType(pathname) === 'Auth'
                     ? 'bg-blue-50 text-blue-800 ring-1 ring-inset ring-blue-600/20'
                     : 'bg-gray-50 text-gray-800 ring-1 ring-inset ring-gray-600/20'
                 }`}>
@@ -101,20 +162,181 @@ export function DebugPanel() {
                   <p className="break-all">{session.user?.email}</p>
                   <p className="text-gray-600">Image:</p>
                   <p className="break-all">{session.user?.image || 'N/A'}</p>
+                  <p className="text-gray-600">User ID:</p>
+                  <p className="break-all">{session.userId || 'N/A'}</p>
+                  <p className="text-gray-600">Role:</p>
+                  <p className="break-all">{session.role || 'N/A'}</p>
+                  <p className="text-gray-600">Groups:</p>
+                  <p className="break-all">{session.profile?.groups?.join(', ') || 'N/A'}</p>
+                  <p className="text-gray-600">Realm Roles:</p>
+                  <p className="break-all">{session.profile?.realm_access?.roles?.join(', ') || 'N/A'}</p>
                   <p className="text-gray-600">Provider:</p>
                   <p className="break-all">{session.provider || 'N/A'}</p>
                   <p className="text-gray-600">Provider ID:</p>
                   <p className="break-all">{session.providerAccountId || 'N/A'}</p>
+                  <p className="text-gray-600">Token Type:</p>
+                  <p className="break-all">{session.tokenType || 'N/A'}</p>
+                  <p className="text-gray-600">Scope:</p>
+                  <p className="break-all">{session.scope || 'N/A'}</p>
+                  <p className="text-gray-600">Expires At:</p>
+                  <p className="break-all">
+                    {session.expiresAt 
+                      ? new Date(session.expiresAt * 1000).toLocaleString()
+                      : 'N/A'
+                    }
+                  </p>
+                  <p className="text-gray-600">Session State:</p>
+                  <p className="break-all">{session.profile?.session_state || 'N/A'}</p>
                   <p className="text-gray-600">Access Token:</p>
-                  <p className="break-all line-clamp-1 hover:line-clamp-none">
-                    {session.accessToken || 'N/A'}
-                  </p>
+                  <div className="group relative">
+                    <p className="break-all line-clamp-1 group-hover:text-gray-400 transition-colors duration-200">
+                      {session.accessToken || 'N/A'}
+                    </p>
+                    {session.accessToken && (
+                      <button
+                        onClick={() => handleCopyToken(session.accessToken || '', 'access')}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center gap-1 bg-white/90 px-2 py-1 rounded text-sm text-gray-600 hover:text-gray-900"
+                      >
+                        {copiedToken === 'access' ? (
+                          <>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="text-green-500"
+                            >
+                              <path d="M20 6 9 17l-5-5" />
+                            </svg>
+                            <span className="text-green-500">Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                            </svg>
+                            Copy
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
                   <p className="text-gray-600">ID Token:</p>
-                  <p className="break-all line-clamp-1 hover:line-clamp-none">
-                    {session.idToken || 'N/A'}
-                  </p>
-                  <p className="text-gray-600">Expires:</p>
-                  <p>{session.expires ? new Date(session.expires).toLocaleString() : 'N/A'}</p>
+                  <div className="group relative">
+                    <p className="break-all line-clamp-1 group-hover:text-gray-400 transition-colors duration-200">
+                      {session.idToken || 'N/A'}
+                    </p>
+                    {session.idToken && (
+                      <button
+                        onClick={() => handleCopyToken(session.idToken || '', 'id')}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center gap-1 bg-white/90 px-2 py-1 rounded text-sm text-gray-600 hover:text-gray-900"
+                      >
+                        {copiedToken === 'id' ? (
+                          <>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="text-green-500"
+                            >
+                              <path d="M20 6 9 17l-5-5" />
+                            </svg>
+                            <span className="text-green-500">Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                            </svg>
+                            Copy
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-gray-600">Refresh Token:</p>
+                  <div className="group relative">
+                    <p className="break-all line-clamp-1 group-hover:text-gray-400 transition-colors duration-200">
+                      {session.refreshToken || 'N/A'}
+                    </p>
+                    {session.refreshToken && (
+                      <button
+                        onClick={() => handleCopyToken(session.refreshToken || '', 'refresh')}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center gap-1 bg-white/90 px-2 py-1 rounded text-sm text-gray-600 hover:text-gray-900"
+                      >
+                        {copiedToken === 'refresh' ? (
+                          <>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="text-green-500"
+                            >
+                              <path d="M20 6 9 17l-5-5" />
+                            </svg>
+                            <span className="text-green-500">Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                            </svg>
+                            Copy
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -259,11 +481,14 @@ export function DebugPanel() {
                   </div>
                 </div>
                 <div className="p-4 bg-gray-900 rounded-lg overflow-auto max-h-[500px] mx-4">
-                  <JsonView 
-                    data={session} 
-                    style={darkStyles}
-                    shouldExpandNode={shouldExpandNode}
-                  />
+                  <style>{customStyles}</style>
+                  {session && (
+                    <JsonView 
+                      data={session} 
+                      style={darkStyles}
+                      shouldExpandNode={shouldExpandNode}
+                    />
+                  )}
                 </div>
               </div>
             </DrawerContent>
