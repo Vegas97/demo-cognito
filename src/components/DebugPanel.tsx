@@ -145,21 +145,114 @@ export function DebugPanel() {
                   </DrawerTrigger>
                   <DrawerContent>
                     <div className="mx-auto w-full max-w-4xl">
-                      <DrawerHeader>
-                        <DrawerTitle>Session Object</DrawerTitle>
-                        <DrawerDescription>
-                          Full session state and user information
-                        </DrawerDescription>
-                      </DrawerHeader>
-                      <div className="px-4">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => setIsExpanded(!isExpanded)}
-                          className="w-full mb-2"
-                        >
-                          {isExpanded ? 'Collapse All' : 'Expand All'}
-                        </Button>
+                      <div className="flex items-center justify-between p-4 border-b">
+                        <div>
+                          <DrawerTitle>Session Object</DrawerTitle>
+                          <DrawerDescription>
+                            Full session state and user information
+                          </DrawerDescription>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            title={isExpanded ? 'Collapse All' : 'Expand All'}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              {isExpanded ? (
+                                <>
+                                  <line x1="18" y1="12" x2="6" y2="12" />
+                                </>
+                              ) : (
+                                <>
+                                  <line x1="12" y1="5" x2="12" y2="19" />
+                                  <line x1="5" y1="12" x2="19" y2="12" />
+                                </>
+                              )}
+                            </svg>
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => {
+                              navigator.clipboard.writeText(JSON.stringify(session, null, 2));
+                            }}
+                            title="Copy JSON"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                            </svg>
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => {
+                              const jsonString = JSON.stringify(session, null, 2);
+                              const blob = new Blob([jsonString], { type: 'application/json' });
+                              const url = URL.createObjectURL(blob);
+                              window.open(url, '_blank');
+                              // Clean up the URL after opening
+                              setTimeout(() => URL.revokeObjectURL(url), 100);
+                            }}
+                            title="View Raw JSON"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                              <polyline points="15 3 21 3 21 9" />
+                              <line x1="10" y1="14" x2="21" y2="3" />
+                            </svg>
+                          </Button>
+                          <DrawerClose asChild>
+                            <Button variant="ghost" size="icon" title="Close">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M18 6 6 18" />
+                                <path d="m6 6 12 12" />
+                              </svg>
+                            </Button>
+                          </DrawerClose>
+                        </div>
                       </div>
                       <div className="p-4 bg-gray-900 rounded-lg overflow-auto max-h-[500px] mx-4">
                         <JsonView 
@@ -167,11 +260,6 @@ export function DebugPanel() {
                           style={darkStyles}
                           shouldExpandNode={shouldExpandNode}
                         />
-                      </div>
-                      <div className="p-4 mt-2 flex justify-end">
-                        <DrawerClose asChild>
-                          <Button variant="outline">Close</Button>
-                        </DrawerClose>
                       </div>
                     </div>
                   </DrawerContent>
