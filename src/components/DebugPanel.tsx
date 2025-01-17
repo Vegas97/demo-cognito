@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import {
@@ -217,7 +217,6 @@ export function DebugPanel() {
                 </div>
 
                 <div className="bg-white shadow rounded-lg p-6 space-y-4">
-                  <h2 className="text-2xl font-bold text-gray-900">Token Timers</h2>
                   <div className="space-y-2">
                     <TokenTimers session={session} />
                   </div>

@@ -150,16 +150,15 @@ export function NavBar() {
         </div>
 
         {/* Sign Out Button */}
-        <div className="pt-6 mt-auto">
-          <div className="border-t border-gray-200 pt-4">
-            <button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="w-full pl-1.5 pr-4 py-1 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700 transition-colors"
-            >
-              Sign Out
-            </button>
-          </div>
-        </div>
+        <button
+          onClick={() => signOut({ 
+            callbackUrl: '/',
+            redirect: true 
+          })}
+          className="mt-4 w-full text-xs text-gray-700 font-medium bg-gray-200 px-3 py-1.5 rounded hover:bg-red-500 hover:text-white transition-colors"
+        >
+          Sign Out
+        </button>
       </div>
     </nav>
   );
