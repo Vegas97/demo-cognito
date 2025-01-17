@@ -15,11 +15,11 @@ import { JsonView, darkStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { publicRoutes, authRoutes, apiAuthPrefix, DEFAULT_LOGIN_REDIRECT } from '@/routes';
+import { publicRoutes, authRoutes, apiAuthPrefix } from '@/routes';
 
 export function DebugPanel() {
   const { data: session, status } = useSession();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true); // Set to true by default
   const pathname = usePathname();
 
   const getRouteType = (path: string) => {
