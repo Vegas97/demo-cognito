@@ -101,6 +101,18 @@ export function DebugPanel() {
                   <p className="break-all">{session.user?.email}</p>
                   <p className="text-gray-600">Image:</p>
                   <p className="break-all">{session.user?.image || 'N/A'}</p>
+                  <p className="text-gray-600">Provider:</p>
+                  <p className="break-all">{session.provider || 'N/A'}</p>
+                  <p className="text-gray-600">Provider ID:</p>
+                  <p className="break-all">{session.providerAccountId || 'N/A'}</p>
+                  <p className="text-gray-600">Access Token:</p>
+                  <p className="break-all line-clamp-1 hover:line-clamp-none">
+                    {session.accessToken || 'N/A'}
+                  </p>
+                  <p className="text-gray-600">ID Token:</p>
+                  <p className="break-all line-clamp-1 hover:line-clamp-none">
+                    {session.idToken || 'N/A'}
+                  </p>
                   <p className="text-gray-600">Expires:</p>
                   <p>{session.expires ? new Date(session.expires).toLocaleString() : 'N/A'}</p>
                 </div>
