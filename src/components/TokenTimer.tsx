@@ -149,7 +149,7 @@ export function TokenTimers({ session }: { session: any }) {
 
         {/* Refresh Token */}
         <ExpirationTimer
-          expiresAt={session.refreshTokenExpires ? Math.floor(new Date(session.refreshTokenExpires).getTime() / 1000) : undefined}
+          expiresAt={session.refreshTokenExpires}
           label="Refresh Token"
           token={session.refreshToken}
         />

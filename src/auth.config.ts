@@ -21,10 +21,37 @@ interface KeycloakProfile {
   attributes?: Record<string, unknown>;
 }
 
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      roles: string[];
+      username: string;
+      emailVerified: boolean;
+      image?: string | null;
+    };
+    provider: string;
+    accessToken?: string;
+    refreshToken?: string;
+    idToken?: string;
+    tokenType?: string;
+    expiresAt?: number;
+    refreshTokenExpires?: number;
+    scope?: string;
+    error?: string;
+  }
+}
+
 export default {
   pages: {
     signIn: "/auth/login",
     signOut: "/",
+  },
+  session: {
+    strategy: "jwt",
+    maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
   },
   providers: [
     Keycloak({
@@ -45,18 +72,18 @@ export default {
       if (account && profile) {
         const keycloakProfile = profile as KeycloakProfile;
         token.accessToken = account.access_token;
-        token.idToken = account.id_token;
         token.refreshToken = account.refresh_token;
+        token.idToken = account.id_token;
         token.provider = account.provider;
         token.providerAccountId = account.providerAccountId;
         token.tokenType = account.token_type;
-        // Convert expires_at to UTC timestamp if it exists
-        token.expiresAt = account.expires_at 
-          ? Math.floor(new Date(account.expires_at * 1000).getTime() / 1000)
-          : undefined;
-        token.scope = account.scope;
-        token.profile = keycloakProfile;
-        token.userId = keycloakProfile.sub;
+
+        // Parse the access token to get its expiration
+        token.expiresAt = Math.floor(Date.now() / 1000 + (account.expires_in as number));
+
+        // Set refresh token expiration to 30 days from now
+        token.refreshTokenExpires = Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60);
+
         token.sessionState = keycloakProfile.sid;
         
         // Extract roles and groups
@@ -96,10 +123,11 @@ export default {
         },
         provider: token.provider,
         accessToken: token.accessToken,
-        idToken: token.idToken,
         refreshToken: token.refreshToken,
+        idToken: token.idToken,
         tokenType: token.tokenType,
         expiresAt: token.expiresAt,
+        refreshTokenExpires: token.refreshTokenExpires,
         scope: token.scope,
         providerAccountId: token.providerAccountId,
         sessionState: token.sessionState,
