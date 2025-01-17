@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { JsonView } from "react-json-view-lite";
 import "react-json-view-lite/dist/index.css";
 import { publicRoutes, authRoutes, apiAuthPrefix } from '@/routes';
+import { TokenTimers } from "./TokenTimer";
 
 const darkStyles = {
   container: "bg-gray-900 text-gray-100",
@@ -149,6 +150,17 @@ export function DebugPanel() {
             </div>
           </div>
         </div>
+
+        {session && (
+          <>
+            <div className="bg-white shadow rounded-lg p-6 space-y-4">
+              <h2 className="text-2xl font-bold text-gray-900">Token Timers</h2>
+              <div className="space-y-2">
+                <TokenTimers session={session} />
+              </div>
+            </div>
+          </>
+        )}
 
         {session && (
           <>

@@ -50,7 +50,10 @@ export default {
         token.provider = account.provider;
         token.providerAccountId = account.providerAccountId;
         token.tokenType = account.token_type;
-        token.expiresAt = account.expires_at;
+        // Convert expires_at to UTC timestamp if it exists
+        token.expiresAt = account.expires_at 
+          ? Math.floor(new Date(account.expires_at * 1000).getTime() / 1000)
+          : undefined;
         token.scope = account.scope;
         token.profile = keycloakProfile;
         token.userId = keycloakProfile.sub;
@@ -67,6 +70,14 @@ export default {
             token.role = keycloakProfile.groups[0].replace('/', '');
           }
         }
+
+        // Debug log for token expiration
+        console.log('Token expiration debug:', {
+          original: account.expires_at,
+          converted: token.expiresAt,
+          now: Math.floor(Date.now() / 1000),
+          diff: token.expiresAt ? token.expiresAt - Math.floor(Date.now() / 1000) : null
+        });
       }
       return token;
     },
