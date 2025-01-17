@@ -15,7 +15,7 @@ import { JsonView, darkStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { publicRoutes, authRoutes, apiAuthPrefix } from '@/routes';
+import { publicRoutes, authRoutes, apiAuthPrefix, DEFAULT_LOGIN_REDIRECT } from '@/routes';
 
 export function DebugPanel() {
   const { data: session, status } = useSession();
@@ -47,9 +47,9 @@ export function DebugPanel() {
               <p>
                 <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
                   getRouteType(pathname) === 'Protected Route' 
-                    ? 'bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-600/20' 
+                    ? 'bg-green-50 text-green-800 ring-1 ring-inset ring-green-600/20' 
                     : getRouteType(pathname) === 'Public Route'
-                    ? 'bg-green-50 text-green-800 ring-1 ring-inset ring-green-600/20'
+                    ? 'bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-600/20'
                     : getRouteType(pathname) === 'Auth Route'
                     ? 'bg-blue-50 text-blue-800 ring-1 ring-inset ring-blue-600/20'
                     : 'bg-gray-50 text-gray-800 ring-1 ring-inset ring-gray-600/20'
@@ -80,11 +80,11 @@ export function DebugPanel() {
           <div className="space-y-2">
             <div className="grid grid-cols-[30%_1fr] gap-x-4">
               <p className="text-gray-600">Provider:</p>
-              <p className="break-all">{process.env.NEXT_PUBLIC_AUTH_PROVIDER}</p>
+              <p className="break-all">Keycloak</p>
               <p className="text-gray-600">Client ID:</p>
-              <p className="break-all">{process.env.NEXT_PUBLIC_AUTH_CLIENT_ID}</p>
+              <p className="break-all">{process.env.NEXT_PUBLIC_AUTH_KEYCLOAK_ID}</p>
               <p className="text-gray-600">Issuer:</p>
-              <p className="break-all">{process.env.NEXT_PUBLIC_AUTH_ISSUER}</p>
+              <p className="break-all">{process.env.NEXT_PUBLIC_AUTH_KEYCLOAK_ISSUER}</p>
             </div>
           </div>
         </div>

@@ -4,9 +4,9 @@ import Keycloak from "next-auth/providers/keycloak";
 export default {
   providers: [
     Keycloak({
-      clientId: process.env.AUTH_KEYCLOAK_ID,
+      clientId: process.env.NEXT_PUBLIC_AUTH_KEYCLOAK_ID,
       clientSecret: process.env.AUTH_KEYCLOAK_SECRET,
-      issuer: process.env.AUTH_KEYCLOAK_ISSUER,
+      issuer: process.env.NEXT_PUBLIC_AUTH_KEYCLOAK_ISSUER,
     }),
   ],
 } satisfies NextAuthConfig
