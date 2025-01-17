@@ -11,6 +11,7 @@ declare module "next-auth" {
     scope?: string;
     providerAccountId?: string;
     userId?: string;
+    sessionState?: string;
     role?: string;
     realmRoles?: string[];
     groups?: string[];

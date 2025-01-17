@@ -164,8 +164,6 @@ export function DebugPanel() {
                   <p className="break-all">{session.user?.image || 'N/A'}</p>
                   <p className="text-gray-600">User ID:</p>
                   <p className="break-all">{session.userId || 'N/A'}</p>
-                  <p className="text-gray-600">Role:</p>
-                  <p className="break-all">{session.role || 'N/A'}</p>
                   <p className="text-gray-600">Groups:</p>
                   <div className="text-sm font-mono bg-gray-50 p-2 rounded-md">
                     {session.profile?.groups?.sort()?.map((group, index) => (

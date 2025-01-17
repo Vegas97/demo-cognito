@@ -6,20 +6,16 @@
 export const publicRoutes = [
   "/",
   "/landingpage",
-  // "/auth/new-verification"
 ];
 
 /**
  * An array of routes that are used for authentication
- * These routes will redirect logged in users to /settings
+ * These routes will redirect logged in users to /dashboard
  * @type {string[]}
  */
 export const authRoutes = [
   "/auth/login",
-  // "/auth/register",
-  // "/auth/error",
-  // "/auth/reset",
-  // "/auth/new-password"
+  "/auth/error",
 ];
 
 /**

@@ -17,10 +17,15 @@ interface KeycloakProfile {
   azp?: string;
   auth_time?: number;
   session_state?: string;
+  sid?: string;
   attributes?: Record<string, unknown>;
 }
 
 export default {
+  pages: {
+    signIn: "/auth/login",
+    signOut: "/",
+  },
   providers: [
     Keycloak({
       clientId: process.env.NEXT_PUBLIC_AUTH_KEYCLOAK_ID,
@@ -48,6 +53,8 @@ export default {
         token.expiresAt = account.expires_at;
         token.scope = account.scope;
         token.profile = keycloakProfile;
+        token.userId = keycloakProfile.sub;
+        token.sessionState = keycloakProfile.sid;
         
         // Extract roles and groups
         if (keycloakProfile.realm_access?.roles) {
@@ -55,6 +62,10 @@ export default {
         }
         if (keycloakProfile.groups) {
           token.groups = keycloakProfile.groups;
+          // Set the first group as the main role (removing the leading slash)
+          if (keycloakProfile.groups.length > 0) {
+            token.role = keycloakProfile.groups[0].replace('/', '');
+          }
         }
       }
       return token;
@@ -70,9 +81,12 @@ export default {
         expiresAt: token.expiresAt,
         scope: token.scope,
         providerAccountId: token.providerAccountId,
+        userId: token.userId,
+        sessionState: token.sessionState,
         profile: token.profile,
         realmRoles: token.realmRoles,
         groups: token.groups,
+        role: token.role,
       };
     },
   },
