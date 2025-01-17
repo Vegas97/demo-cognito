@@ -35,6 +35,13 @@ const darkStyles = {
 export function DebugPanel() {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const [activeTab, setActiveTab] = useState(() => {
+    // Try to get the saved tab from localStorage, default to "routes"
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('debugPanelTab') || 'routes';
+    }
+    return 'routes';
+  });
 
   const isPublicRoute = publicRoutes.includes(pathname);
   const isAuthRoute = authRoutes.includes(pathname);
@@ -52,10 +59,15 @@ export function DebugPanel() {
     return true; // Always expand nodes
   };
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    localStorage.setItem('debugPanelTab', value);
+  };
+
   return (
     <div className="h-full overflow-hidden relative">
       <div className="h-full overflow-y-auto px-6 py-6 bg-gray-50 space-y-6 pb-16">
-        <Tabs defaultValue="routes" className="w-full">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="routes">Routes & Auth</TabsTrigger>
             <TabsTrigger value="session">User & Session</TabsTrigger>
