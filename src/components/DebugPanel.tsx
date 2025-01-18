@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import {
@@ -55,7 +55,8 @@ export function DebugPanel() {
     ? 'API Auth'
     : 'Protected';
 
-  const shouldExpandNode = (keyPath: string[], value: unknown) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const shouldExpandNode = (_level: number, _value: unknown, _field?: string) => {
     return true; // Always expand nodes
   };
 

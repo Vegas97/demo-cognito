@@ -3,8 +3,9 @@
  * This file manages route access based on authentication status and route types
  */
 
-import NextAuth from "next-auth";
-import authConfig from "@/auth.config";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { auth } from "./auth";
 import {
   DEFAULT_LOGIN_REDIRECT,
   apiAuthPrefix,
@@ -12,13 +13,13 @@ import {
   publicRoutes,
 } from "@/routes";
 
-// Initialize NextAuth middleware with our auth configuration
-const { auth: middleware } = NextAuth(authConfig);
+// This function can be marked `async` if using `await` inside
+export async function middleware(request: NextRequest) {
+  const session = await auth();
 
-export default middleware((req) => {
   // Extract URL and authentication status from the request
-  const { nextUrl } = req;
-  const isLoggedIn = !!req.auth;
+  const { nextUrl } = request;
+  const isLoggedIn = !!session;
 
   // Determine the type of route being accessed
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
@@ -27,16 +28,16 @@ export default middleware((req) => {
 
   // Skip middleware for API authentication routes (e.g., /api/auth/*)
   if (isApiAuthRoute) {
-    return;
+    return NextResponse.next();
   }
 
   // Handle auth routes (login, register, etc.)
   if (isAuthRoute) {
     // Redirect already authenticated users away from auth pages
     if (isLoggedIn) {
-      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
     }
-    return;
+    return NextResponse.next();
   }
 
   // Protect non-public routes from unauthenticated access
@@ -50,7 +51,7 @@ export default middleware((req) => {
     const encodedCallbackUrl = encodeURIComponent(callbackUrl);
 
     // Redirect to login page with callback URL
-    return Response.redirect(new URL(
+    return NextResponse.redirect(new URL(
       `/auth/login?callbackUrl=${encodedCallbackUrl}`,
       nextUrl
     ));
@@ -59,8 +60,8 @@ export default middleware((req) => {
   // Allow the request to proceed for:
   // - Authenticated users accessing protected routes
   // - Public routes
-  return;
-});
+  return NextResponse.next();
+}
 
 // Configure which paths should be processed by this middleware
 export const config = {

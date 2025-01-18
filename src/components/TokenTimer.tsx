@@ -10,7 +10,7 @@ interface TimerProps {
 }
 
 function formatTimeLeft(timeLeft: number): string {
-  const formatTime = (seconds: number) => {
+  const formatTime = (seconds: number): string => {
     if (seconds <= 0) return "Expired";
 
     const years = Math.floor(seconds / (365 * 24 * 3600));
@@ -120,7 +120,15 @@ function ExpirationTimer({ expiresAt, label, token }: TimerProps) {
   );
 }
 
-export function TokenTimers({ session }: { session: any }) {
+export function TokenTimers({ session }: { session: { 
+  expiresAt?: number;
+  accessTokenExpiresAt?: number;
+  idTokenExpiresAt?: number;
+  accessToken?: string;
+  idToken?: string;
+  refreshToken?: string;
+  refreshTokenExpires?: number;
+} }) {
   // Debug log to see all available tokens
   console.log('Session data:', session);
 
@@ -129,20 +137,20 @@ export function TokenTimers({ session }: { session: any }) {
       <div className="space-y-6">
         {/* Session */}
         <ExpirationTimer
-          expiresAt={session.expires ? Math.floor(new Date(session.expires).getTime() / 1000) : undefined}
+          expiresAt={session.expiresAt}
           label="Session"
         />
         
         {/* Access Token */}
         <ExpirationTimer
-          expiresAt={session.expiresAt}
+          expiresAt={session.accessTokenExpiresAt}
           label="Access Token"
           token={session.accessToken}
         />
 
         {/* ID Token */}
         <ExpirationTimer
-          expiresAt={session.idTokenExpires ? Math.floor(new Date(session.idTokenExpires).getTime() / 1000) : undefined}
+          expiresAt={session.idTokenExpiresAt}
           label="ID Token"
           token={session.idToken}
         />
