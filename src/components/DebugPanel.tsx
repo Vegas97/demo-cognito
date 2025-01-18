@@ -126,10 +126,6 @@ export function DebugPanel() {
     }
   };
 
-  if (!session) {
-    return <div>Not signed in</div>;
-  }
-
   return (
     <div className="h-full overflow-hidden relative">
       <div className="h-full overflow-y-auto px-6 py-6 bg-gray-50 space-y-6 pb-16">
@@ -220,6 +216,7 @@ export function DebugPanel() {
           </TabsContent>
 
           <TabsContent value="session" className="space-y-6 mt-6">
+          {session ? (
             <div className="space-y-6 p-6 max-w-4xl mx-auto">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Debug Information</h2>
               
@@ -253,6 +250,12 @@ export function DebugPanel() {
                 data={session.extra}
               />
             </div>
+          ) : (
+              <div className="flex flex-col items-center justify-center p-12 bg-white rounded-lg shadow">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Not Signed In</h3>
+                <p className="text-gray-600">Sign in to view session information and debug data.</p>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>
