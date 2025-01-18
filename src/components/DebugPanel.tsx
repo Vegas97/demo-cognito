@@ -18,6 +18,32 @@ import { publicRoutes, authRoutes, apiAuthPrefix } from '@/routes';
 import { TokenTimers } from "./TokenTimer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+interface DebugSectionProps {
+  title: string;
+  data: any;
+}
+
+function DebugSection({ title, data }: DebugSectionProps) {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  return (
+    <div className="border rounded-lg p-4 bg-white shadow-sm">
+      <button
+        className="flex justify-between w-full text-left font-medium text-gray-900 mb-2"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <span>{title}</span>
+        <span>{isExpanded ? '−' : '+'}</span>
+      </button>
+      {isExpanded && (
+        <pre className="text-sm text-gray-600 overflow-auto">
+          {JSON.stringify(data, null, 2)}
+        </pre>
+      )}
+    </div>
+  );
+}
+
 const darkStyles = {
   container: "bg-gray-900 text-gray-100",
   basicChildStyle: "bg-gray-900 text-gray-100",
@@ -64,6 +90,10 @@ export function DebugPanel() {
     setActiveTab(value);
     localStorage.setItem('debugPanelTab', value);
   };
+
+  if (!session) {
+    return <div>Not signed in</div>;
+  }
 
   return (
     <div className="h-full overflow-hidden relative">
@@ -155,75 +185,39 @@ export function DebugPanel() {
           </TabsContent>
 
           <TabsContent value="session" className="space-y-6 mt-6">
-            {session && (
-              <>
-                <div className="bg-white shadow rounded-lg p-6 space-y-4">
-                  <h2 className="text-2xl font-bold text-gray-900">User Information</h2>
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">User Info</h3>
-                    <div className="grid grid-cols-[30%_1fr] gap-x-4">
-                      <p className="text-gray-600">Name:</p>
-                      <p className="break-all">{session.user.name || 'N/A'}</p>
-                      <p className="text-gray-600">Username:</p>
-                      <p className="break-all">{session.user.username || 'N/A'}</p>
-                      <p className="text-gray-600">Email:</p>
-                      <p className="break-all">{session.user.email || 'N/A'}</p>
-                      <p className="text-gray-600">Email Verified:</p>
-                      <p className="break-all">{session.user.emailVerified ? 'Yes' : 'No'}</p>
-                      <p className="text-gray-600">User ID:</p>
-                      <p className="break-all">{session.user.id || 'N/A'}</p>
-                      <p className="text-gray-600">Profile Access (Groups):</p>
-                      <p className="break-all">{session.user.profileAccess || 'N/A'}</p>
-                      <p className="text-gray-600">Custom Roles:</p>
-                      <div className="text-sm font-mono bg-gray-50 p-2 rounded-md max-h-40 overflow-y-auto">
-                        {session.user.roles?.sort()?.map((role, index) => (
-                          <div key={index} className="text-gray-800">
-                            {role}
-                          </div>
-                        )) || 'N/A'}
-                      </div>
-                    </div>
+            <div className="space-y-6 p-6 max-w-4xl mx-auto">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Debug Information</h2>
+              
+              {/* Token Timers */}
+              <div className="bg-white shadow-sm rounded-lg p-6 border">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Token Timers</h3>
+                <TokenTimers session={session} />
+              </div>
 
-                    <h3 className="text-lg font-semibold mt-6">Additional Details</h3>
-                    <div className="grid grid-cols-[30%_1fr] gap-x-4">
-                      <p className="text-gray-600">System Roles:</p>
-                      <div className="text-sm font-mono bg-gray-50 p-2 rounded-md max-h-40 overflow-y-auto">
-                        {session.profile?.realm_access?.roles
-                          ?.filter(role => !role.startsWith('ROLE_'))
-                          ?.sort()
-                          ?.map((role, index) => (
-                            <div key={index} className="text-gray-800">
-                              {role}
-                            </div>
-                          )) || 'N/A'}
-                      </div>
-                      <p className="text-gray-600">Provider:</p>
-                      <p className="break-all">{session.provider || 'N/A'}</p>
-                      <p className="text-gray-600">Provider ID:</p>
-                      <p className="break-all">{session.providerAccountId || 'N/A'}</p>
-                      <p className="text-gray-600">Token Type:</p>
-                      <p className="break-all">{session.tokenType || 'N/A'}</p>
-                      <p className="text-gray-600">Scope:</p>
-                      <p className="break-all">{session.scope || 'N/A'}</p>
-                      <p className="text-gray-600">Expires At:</p>
-                      <p className="break-all">
-                        {session.expiresAt
-                          ? new Date(session.expiresAt * 1000).toLocaleString()
-                          : 'N/A'}
-                      </p>
-                      <p className="text-gray-600">Session State:</p>
-                      <p className="break-all">{session.sessionState || 'N/A'}</p>
-                    </div>
-                  </div>
-                </div>
+              {/* User Information */}
+              <DebugSection
+                title="User Information"
+                data={session.user}
+              />
 
-                <div className="bg-white shadow rounded-lg p-6 space-y-4">
-                  <div className="space-y-2">
-                    <TokenTimers session={session} />
-                  </div>
-                </div>
-              </>
-            )}
+              {/* Token Information */}
+              <DebugSection
+                title="Token Information"
+                data={session.tokens}
+              />
+
+              {/* Timing Information */}
+              <DebugSection
+                title="Timing Information"
+                data={session.timing}
+              />
+
+              {/* Extra Information */}
+              <DebugSection
+                title="Extra Information"
+                data={session.extra}
+              />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
