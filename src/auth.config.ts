@@ -25,6 +25,7 @@ interface KeycloakProfile {
 // Extend the built-in session type
 declare module "next-auth" {
   interface Session {
+    expires: string;
     user: {
       name: string;
       email: string;
@@ -43,10 +44,8 @@ declare module "next-auth" {
       sessionId: string;
     };
     timing: {
-      sessionExpiresISO: string;
       accessTokenExpiresAt: number;
       refreshTokenExpiresAt: number;
-      sessionExpiresAt: number;
       issuedAt: number;
       authTime: number;
     };
@@ -91,7 +90,6 @@ export const authConfig: NextAuthConfig = {
         // Store timing information
         token.expiresAt = account.expires_at;
         token.refreshTokenExpires = Math.floor(Date.now() / 1000) + (account.refresh_expires_in as number);
-        token.sessionExpires = Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60);
         token.issuedAt = keycloakProfile.iat;
         token.authTime = keycloakProfile.auth_time;
 
@@ -117,7 +115,7 @@ export const authConfig: NextAuthConfig = {
 
     async session({ session, token }) {
       return {
-        ...session,
+        expires: session.expires,
         user: {
           name: token.name,
           email: token.email,
@@ -136,10 +134,8 @@ export const authConfig: NextAuthConfig = {
           sessionId: token.sessionId,
         },
         timing: {
-          sessionExpiresISO: session.expires,
           accessTokenExpiresAt: token.expiresAt,
           refreshTokenExpiresAt: token.refreshTokenExpires,
-          sessionExpiresAt: token.sessionExpires,
           issuedAt: token.issuedAt,
           authTime: token.authTime,
         },

@@ -121,14 +121,17 @@ function ExpirationTimer({ expiresAt, label, token }: TimerProps) {
 }
 
 export function TokenTimers({ session }: { session: any }) {
-  const { tokens, timing } = session;
+  const { tokens, timing, expires } = session;
+
+  // Convert ISO string to Unix timestamp
+  const sessionExpiresAt = expires ? Math.floor(new Date(expires).getTime() / 1000) : undefined;
 
   return (
     <div className="space-y-4">
       <div className="space-y-6">
         {/* Session */}
         <ExpirationTimer
-          expiresAt={timing.sessionExpiresAt}
+          expiresAt={sessionExpiresAt}
           label="Session"
         />
         

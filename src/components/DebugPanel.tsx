@@ -330,11 +330,7 @@ export function DebugPanel() {
                     data={session || {}} 
                     shouldExpandNode={shouldExpandNode}
                     style={darkStyles}
-                    displayDataTypes={false}
-                    displayObjectSize={false}
                     enableClipboard={true}
-                    collapseStringsAfterLength={80}
-                    indentWidth={2}
                   />
                 </div>
               </div>
