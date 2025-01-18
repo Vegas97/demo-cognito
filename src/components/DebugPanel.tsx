@@ -315,45 +315,52 @@ export function DebugPanel() {
               </Button>
             </DrawerTrigger>
             <DrawerContent>
-              <div className="mx-auto w-full max-w-4xl p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <div>
-                    <DrawerTitle>Session Data</DrawerTitle>
-                    <DrawerDescription>Raw session data from NextAuth.js</DrawerDescription>
+              <div className="mx-auto w-full max-w-4xl">
+                <div className="border rounded-lg p-4 bg-background shadow-sm m-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <div>
+                      <DrawerTitle className="font-medium text-foreground">Session Data</DrawerTitle>
+                      <DrawerDescription>Raw session data from NextAuth.js</DrawerDescription>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        title={isExpanded ? "Collapse All" : "Expand All"}
+                      >
+                        {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={copyToClipboard}
+                        title="Copy to Clipboard"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={openInNewTab}
+                        title="Open in New Tab"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                      <DrawerClose asChild>
+                        <Button variant="ghost" size="icon">
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </DrawerClose>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setIsExpanded(!isExpanded)}
-                      className="p-2 hover:bg-[#2a2a2a] rounded-md text-gray-400 hover:text-white transition-colors"
-                      title={isExpanded ? "Collapse All" : "Expand All"}
-                    >
-                      {isExpanded ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-                    </button>
-                    <button
-                      onClick={copyToClipboard}
-                      className="p-2 hover:bg-[#2a2a2a] rounded-md text-gray-400 hover:text-white transition-colors"
-                      title="Copy to Clipboard"
-                    >
-                      <Copy size={18} />
-                    </button>
-                    <button
-                      onClick={openInNewTab}
-                      className="p-2 hover:bg-[#2a2a2a] rounded-md text-gray-400 hover:text-white transition-colors"
-                      title="Open in New Tab"
-                    >
-                      <ExternalLink size={18} />
-                    </button>
-                    <DrawerClose className="p-2 hover:bg-[#2a2a2a] rounded-md text-gray-400 hover:text-white transition-colors">
-                      <X size={18} />
-                    </DrawerClose>
+                  <div className="bg-muted p-4 rounded-md overflow-auto max-h-[60vh]">
+                    <JsonView 
+                      data={session || {}} 
+                      shouldExpandNode={shouldExpandNode}
+                      style={{ background: 'transparent' }}
+                    />
                   </div>
-                </div>
-                <div className="bg-[#1e1e1e] p-6 rounded-lg shadow-lg overflow-auto max-h-[60vh]">
-                  <JsonView 
-                    data={session || {}} 
-                    shouldExpandNode={shouldExpandNode}
-                    style={darkStyles}
-                  />
                 </div>
               </div>
             </DrawerContent>
