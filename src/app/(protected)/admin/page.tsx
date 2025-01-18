@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 export default async function AdminPage() {
   const session = await auth();
   
+// TODO insted of check role, check profileAccess (Groups)
+
   // Check if user has admin role
   const isAdmin = session?.user.roles.some(role => role === "ROLE_ADMIN");
   
