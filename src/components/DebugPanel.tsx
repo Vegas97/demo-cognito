@@ -28,19 +28,41 @@ interface DebugSectionProps {
 function DebugSection({ title, data }: DebugSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+  };
+
   return (
-    <div className="border rounded-lg p-4 bg-white shadow-sm">
-      <button
-        className="flex justify-between w-full text-left font-medium text-gray-900 mb-2"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <span>{title}</span>
-        <span>{isExpanded ? '−' : '+'}</span>
-      </button>
+    <div className="border rounded-lg p-4 bg-background shadow-sm">
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="font-medium text-foreground">{title}</h3>
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={copyToClipboard}
+            title="Copy to clipboard"
+          >
+            <Copy className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsExpanded(!isExpanded)}
+            title={isExpanded ? "Collapse" : "Expand"}
+          >
+            {isExpanded ? (
+              <Minimize2 className="h-4 w-4" />
+            ) : (
+              <Maximize2 className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      </div>
       {isExpanded && (
-        <pre className="text-sm text-gray-600 overflow-auto">
-          {JSON.stringify(data, null, 2)}
-        </pre>
+        <div className="bg-muted p-4 rounded-md overflow-auto max-h-[500px]">
+          <JsonView data={data} style={{ background: 'transparent' }} />
+        </div>
       )}
     </div>
   );
