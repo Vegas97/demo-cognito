@@ -9,6 +9,19 @@ interface TimerProps {
   token?: string;
 }
 
+interface Session {
+  tokens: {
+    accessToken: string;
+    idToken: string;
+    refreshToken: string;
+  };
+  timing: {
+    accessTokenExpiresAt: number;
+    refreshTokenExpiresAt: number;
+  };
+  expires: string;
+}
+
 function formatTimeLeft(timeLeft: number): string {
   const formatTime = (seconds: number): string => {
     if (seconds <= 0) return "Expired";
@@ -120,7 +133,7 @@ function ExpirationTimer({ expiresAt, label, token }: TimerProps) {
   );
 }
 
-export function TokenTimers({ session }: { session: any }) {
+export function TokenTimers({ session }: { session: Session }) {
   const { tokens, timing, expires } = session;
 
   // Convert ISO string to Unix timestamp

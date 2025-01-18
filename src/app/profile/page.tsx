@@ -1,5 +1,4 @@
 import { auth } from "@/auth";
-import { DebugPanel } from "@/components/DebugPanel";
 import { redirect } from "next/navigation";
 
 export default async function Profile() {

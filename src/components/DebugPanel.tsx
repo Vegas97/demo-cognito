@@ -21,7 +21,8 @@ import { X, Copy, Maximize2, Minimize2, ExternalLink } from "lucide-react";
 
 interface DebugSectionProps {
   title: string;
-  data: any;
+  data: unknown;
+  onClose?: () => void;
 }
 
 function DebugSection({ title, data }: DebugSectionProps) {
@@ -122,7 +123,7 @@ export function DebugPanel() {
   };
 
   // Function to determine node expansion
-  const shouldExpandNode = (level: number, value: unknown) => {
+  const shouldExpandNode = (level: number) => {
     if (isExpanded) {
       return true;
     }
@@ -330,7 +331,6 @@ export function DebugPanel() {
                     data={session || {}} 
                     shouldExpandNode={shouldExpandNode}
                     style={darkStyles}
-                    enableClipboard={true}
                   />
                 </div>
               </div>
