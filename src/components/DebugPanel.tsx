@@ -46,16 +46,19 @@ function DebugSection({ title, data }: DebugSectionProps) {
 
 const darkStyles = {
   container: "bg-gray-900 text-gray-100",
-  basicChildStyle: "bg-gray-900 text-gray-100",
-  bigBrace: "text-gray-100",
-  brace: "text-gray-100",
-  colon: "text-gray-100",
-  comma: "text-gray-100",
-  objectKey: "text-blue-400",
-  nullValue: "text-gray-500",
+  basicChildStyle: "bg-gray-900 text-gray-100 pl-4",
+  advancedChildStyle: "bg-gray-800 text-gray-100",
+  buttonStyle: "text-gray-100",
+  closeButtonStyle: "text-gray-100",
+  bigBrace: "text-gray-300",
+  brace: "text-gray-300",
+  colon: "text-gray-300",
+  comma: "text-gray-300",
+  objectKey: "text-blue-400 font-medium",
+  nullValue: "text-red-400",
   primitiveValue: "text-green-400",
-  primitiveString: "text-yellow-400",
-  ellipsis: "text-gray-500",
+  primitiveString: "text-yellow-300",
+  ellipsis: "text-gray-400",
 };
 
 export function DebugPanel() {
@@ -253,11 +256,16 @@ export function DebugPanel() {
               <div className="mx-auto w-full max-w-4xl p-6">
                 <DrawerTitle>Session Data</DrawerTitle>
                 <DrawerDescription>Raw session data from NextAuth.js</DrawerDescription>
-                <div className="mt-4 rounded-lg bg-gray-900 p-4 overflow-auto max-h-[60vh]">
+                <div className="bg-gray-900 p-6 rounded-lg shadow-lg overflow-auto max-h-[60vh]">
                   <JsonView 
                     data={session || {}} 
                     shouldExpandNode={shouldExpandNode} 
                     style={darkStyles}
+                    displayDataTypes={false}
+                    displayObjectSize={false}
+                    enableClipboard={true}
+                    collapseStringsAfterLength={80}
+                    indentWidth={4}
                   />
                 </div>
                 <div className="mt-4 flex justify-end">
