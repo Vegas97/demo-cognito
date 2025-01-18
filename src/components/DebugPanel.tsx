@@ -68,11 +68,6 @@ export function DebugPanel() {
     ? 'API Auth'
     : 'Protected';
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const shouldExpandNode = (_level: number, _value: unknown, _field?: string) => {
-    return true; // Always expand nodes
-  };
-
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     localStorage.setItem('debugPanelTab', value);
@@ -124,6 +119,15 @@ export function DebugPanel() {
         </html>
       `);
     }
+  };
+
+  // Function to determine node expansion
+  const shouldExpandNode = (level: number, value: unknown) => {
+    if (isExpanded) {
+      return true;
+    }
+    // When collapsed, only show first level objects/arrays
+    return level === 0;
   };
 
   return (
@@ -324,7 +328,7 @@ export function DebugPanel() {
                 <div className="bg-[#1e1e1e] p-6 rounded-lg shadow-lg overflow-auto max-h-[60vh]">
                   <JsonView 
                     data={session || {}} 
-                    shouldExpandNode={() => isExpanded}
+                    shouldExpandNode={shouldExpandNode}
                     style={darkStyles}
                     displayDataTypes={false}
                     displayObjectSize={false}
