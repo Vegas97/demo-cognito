@@ -1,14 +1,16 @@
 import { auth } from "@/auth";
 import { DebugPanel } from "@/components/DebugPanel";
+import { redirect } from "next/navigation";
 
-export default async function ProfilePage() {
+export default async function Profile() {
   const session = await auth();
+  if (!session) {
+    redirect("/auth/login");
+  }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Profile Page</h1>
-      <p className="mb-4">This is a protected page. You can only see this if you&apos;re authenticated.</p>
-      <DebugPanel />
+    <div className="container mx-auto px-4 py-8">
+      Profile page for {session.user.name}
     </div>
   );
 }
