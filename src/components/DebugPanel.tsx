@@ -17,6 +17,7 @@ import "react-json-view-lite/dist/index.css";
 import { publicRoutes, authRoutes, apiAuthPrefix } from '@/routes';
 import { TokenTimers } from "./TokenTimer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { X, Copy, Maximize2, Minimize2, ExternalLink } from "lucide-react";
 
 interface DebugSectionProps {
   title: string;
@@ -43,23 +44,6 @@ function DebugSection({ title, data }: DebugSectionProps) {
     </div>
   );
 }
-
-const darkStyles = {
-  container: "bg-gray-900 text-gray-100",
-  basicChildStyle: "bg-gray-900 text-gray-100 pl-4",
-  advancedChildStyle: "bg-gray-800 text-gray-100",
-  buttonStyle: "text-gray-100",
-  closeButtonStyle: "text-gray-100",
-  bigBrace: "text-gray-300",
-  brace: "text-gray-300",
-  colon: "text-gray-300",
-  comma: "text-gray-300",
-  objectKey: "text-blue-400 font-medium",
-  nullValue: "text-red-400",
-  primitiveValue: "text-green-400",
-  primitiveString: "text-yellow-300",
-  ellipsis: "text-gray-400",
-};
 
 export function DebugPanel() {
   const { data: session } = useSession();
@@ -92,6 +76,54 @@ export function DebugPanel() {
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     localStorage.setItem('debugPanelTab', value);
+  };
+
+  // Monokai-inspired theme
+  const darkStyles = {
+    container: "bg-[#1e1e1e] text-[#f8f8f2]",
+    basicChildStyle: "bg-[#1e1e1e] text-[#f8f8f2] pl-4",
+    advancedChildStyle: "bg-[#1e1e1e] text-[#f8f8f2]",
+    buttonStyle: "text-[#f8f8f2]",
+    closeButtonStyle: "text-[#f8f8f2]",
+    bigBrace: "text-[#ff79c6] font-medium",
+    brace: "text-[#ff79c6] font-medium",
+    colon: "text-[#ff79c6]",
+    comma: "text-[#ff79c6]",
+    label: "text-[#ff9d00] font-semibold",
+    objectKey: "text-[#ff9d00] font-semibold",
+    nullValue: "text-[#bd93f9] font-medium",
+    primitiveValue: "text-[#50fa7b] font-medium",
+    primitiveString: "text-[#f1fa8c] font-medium",
+    ellipsis: "text-[#6272a4]",
+  };
+
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  // Function to copy JSON to clipboard
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(JSON.stringify(session, null, 2));
+  };
+
+  // Function to open JSON in new tab
+  const openInNewTab = () => {
+    const jsonString = JSON.stringify(session, null, 2);
+    const newWindow = window.open();
+    if (newWindow) {
+      newWindow.document.write(`
+        <html>
+          <head>
+            <title>Session Data</title>
+            <style>
+              body { background: #1e1e1e; color: #f8f8f2; font-family: monospace; padding: 20px; }
+              pre { white-space: pre-wrap; word-wrap: break-word; }
+            </style>
+          </head>
+          <body>
+            <pre>${jsonString}</pre>
+          </body>
+        </html>
+      `);
+    }
   };
 
   if (!session) {
@@ -254,24 +286,49 @@ export function DebugPanel() {
             </DrawerTrigger>
             <DrawerContent>
               <div className="mx-auto w-full max-w-4xl p-6">
-                <DrawerTitle>Session Data</DrawerTitle>
-                <DrawerDescription>Raw session data from NextAuth.js</DrawerDescription>
-                <div className="bg-gray-900 p-6 rounded-lg shadow-lg overflow-auto max-h-[60vh]">
+                <div className="flex justify-between items-center mb-4">
+                  <div>
+                    <DrawerTitle>Session Data</DrawerTitle>
+                    <DrawerDescription>Raw session data from NextAuth.js</DrawerDescription>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setIsExpanded(!isExpanded)}
+                      className="p-2 hover:bg-[#2a2a2a] rounded-md text-gray-400 hover:text-white transition-colors"
+                      title={isExpanded ? "Collapse All" : "Expand All"}
+                    >
+                      {isExpanded ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+                    </button>
+                    <button
+                      onClick={copyToClipboard}
+                      className="p-2 hover:bg-[#2a2a2a] rounded-md text-gray-400 hover:text-white transition-colors"
+                      title="Copy to Clipboard"
+                    >
+                      <Copy size={18} />
+                    </button>
+                    <button
+                      onClick={openInNewTab}
+                      className="p-2 hover:bg-[#2a2a2a] rounded-md text-gray-400 hover:text-white transition-colors"
+                      title="Open in New Tab"
+                    >
+                      <ExternalLink size={18} />
+                    </button>
+                    <DrawerClose className="p-2 hover:bg-[#2a2a2a] rounded-md text-gray-400 hover:text-white transition-colors">
+                      <X size={18} />
+                    </DrawerClose>
+                  </div>
+                </div>
+                <div className="bg-[#1e1e1e] p-6 rounded-lg shadow-lg overflow-auto max-h-[60vh]">
                   <JsonView 
                     data={session || {}} 
-                    shouldExpandNode={shouldExpandNode} 
+                    shouldExpandNode={() => isExpanded}
                     style={darkStyles}
                     displayDataTypes={false}
                     displayObjectSize={false}
                     enableClipboard={true}
                     collapseStringsAfterLength={80}
-                    indentWidth={4}
+                    indentWidth={2}
                   />
-                </div>
-                <div className="mt-4 flex justify-end">
-                  <DrawerClose asChild>
-                    <Button variant="outline">Close</Button>
-                  </DrawerClose>
                 </div>
               </div>
             </DrawerContent>
