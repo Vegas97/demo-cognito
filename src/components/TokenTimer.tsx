@@ -81,7 +81,7 @@ function ExpirationTimer({ expiresAt, label, token }: TimerProps) {
   if (!expiresAt) return null;
 
   const expirationDate = new Date(expiresAt * 1000).toLocaleString('en-US', {
-    timeZone: 'Europe/Paris', // Using the user's timezone
+    timeZone: 'Europe/Paris',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -120,46 +120,37 @@ function ExpirationTimer({ expiresAt, label, token }: TimerProps) {
   );
 }
 
-export function TokenTimers({ session }: { session: { 
-  expiresAt?: number;
-  accessTokenExpiresAt?: number;
-  idTokenExpiresAt?: number;
-  accessToken?: string;
-  idToken?: string;
-  refreshToken?: string;
-  refreshTokenExpires?: number;
-} }) {
-  // Debug log to see all available tokens
-  console.log('Session data:', session);
+export function TokenTimers({ session }: { session: any }) {
+  const { tokens, timing } = session;
 
   return (
     <div className="space-y-4">
       <div className="space-y-6">
         {/* Session */}
         <ExpirationTimer
-          expiresAt={session.expiresAt}
+          expiresAt={timing.sessionExpiresAt}
           label="Session"
         />
         
         {/* Access Token */}
         <ExpirationTimer
-          expiresAt={session.accessTokenExpiresAt}
+          expiresAt={timing.accessTokenExpiresAt}
           label="Access Token"
-          token={session.accessToken}
+          token={tokens.accessToken}
         />
 
         {/* ID Token */}
         <ExpirationTimer
-          expiresAt={session.idTokenExpiresAt}
+          expiresAt={timing.accessTokenExpiresAt} // ID token expires same time as access token
           label="ID Token"
-          token={session.idToken}
+          token={tokens.idToken}
         />
 
         {/* Refresh Token */}
         <ExpirationTimer
-          expiresAt={session.refreshTokenExpires}
+          expiresAt={timing.refreshTokenExpiresAt}
           label="Refresh Token"
-          token={session.refreshToken}
+          token={tokens.refreshToken}
         />
       </div>
     </div>
