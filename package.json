@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint || true && npm run typecheck"
+    "check": "npm run lint || true && npm run typecheck",
+    "clean": "rm -rf .next"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.1",
