@@ -17,6 +17,14 @@ import {
 export async function middleware(request: NextRequest) {
   const session = await auth();
 
+  // Check for refresh token error
+  if (session?.error === "RefreshTokenError") {
+    // Redirect to sign in page with error
+    const signInUrl = new URL("/auth/login", request.url);
+    signInUrl.searchParams.set("error", "RefreshTokenError");
+    return NextResponse.redirect(signInUrl);
+  }
+
   // Extract URL and authentication status from the request
   const { nextUrl } = request;
   const isLoggedIn = !!session;

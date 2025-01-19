@@ -61,7 +61,11 @@ function DebugSection({ title, data }: DebugSectionProps) {
       </div>
       {isExpanded && (
         <div className="bg-muted p-4 rounded-md overflow-auto max-h-[500px]">
-          <JsonView data={data} style={{ background: 'transparent' }} />
+          <JsonView 
+            data={data as unknown as Record<string, unknown>} 
+            style={{}}
+            className="bg-transparent text-current"
+          />
         </div>
       )}
     </div>
@@ -94,25 +98,6 @@ export function DebugPanel() {
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     localStorage.setItem('debugPanelTab', value);
-  };
-
-  // Monokai-inspired theme
-  const darkStyles = {
-    container: "bg-[#1e1e1e] text-[#f8f8f2]",
-    basicChildStyle: "bg-[#1e1e1e] text-[#f8f8f2] pl-4",
-    advancedChildStyle: "bg-[#1e1e1e] text-[#f8f8f2]",
-    buttonStyle: "text-[#f8f8f2]",
-    closeButtonStyle: "text-[#f8f8f2]",
-    bigBrace: "text-[#ff79c6] font-medium",
-    brace: "text-[#ff79c6] font-medium",
-    colon: "text-[#ff79c6]",
-    comma: "text-[#ff79c6]",
-    label: "text-[#ff9d00] font-semibold",
-    objectKey: "text-[#ff9d00] font-semibold",
-    nullValue: "text-[#bd93f9] font-medium",
-    primitiveValue: "text-[#50fa7b] font-medium",
-    primitiveString: "text-[#f1fa8c] font-medium",
-    ellipsis: "text-[#6272a4]",
   };
 
   const [isExpanded, setIsExpanded] = useState(true);
@@ -358,7 +343,8 @@ export function DebugPanel() {
                     <JsonView 
                       data={session || {}} 
                       shouldExpandNode={shouldExpandNode}
-                      style={{ background: 'transparent' }}
+                      style={{}}
+                      className="bg-transparent text-current"
                     />
                   </div>
                 </div>
