@@ -55,6 +55,14 @@ export function NavBar() {
                 Dashboard
               </Link>
               <Link
+                href="/token-test"
+                className={`block pl-1.5 pr-4 py-1 text-xs font-medium rounded hover:bg-blue-600 hover:text-white transition-colors ${isActive(
+                  '/token-test'
+                )}`}
+              >
+                Token Test
+              </Link>
+              <Link
                 href="/profile"
                 className={`block pl-1.5 pr-4 py-1 text-xs font-medium rounded hover:bg-blue-600 hover:text-white transition-colors ${isActive(
                   '/profile'

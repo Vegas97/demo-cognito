@@ -1,6 +1,7 @@
 import { NextAuthConfig } from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
-import { JWT } from "next-auth/jwt";
+import { Session } from "next-auth";
+import { JWT as NextAuthJWT } from "next-auth/jwt";
 
 // Add type declarations for Keycloak profile and token
 interface KeycloakProfile {
@@ -60,32 +61,30 @@ declare module "next-auth" {
 }
 
 // Add JWT type extension
-declare module "next-auth/jwt" {
-  interface JWT {
-    error?: "RefreshTokenError";
-    accessToken: string;
-    refreshToken: string;
-    idToken: string;
-    sessionId: string;
-    expiresAt: number;
-    refreshTokenExpires: number;
-    issuedAt: number;
-    authTime: number;
-    name: string;
-    email: string;
-    emailVerified: boolean;
-    profileAccess: string;
-    roles: string[];
-    username: string;
-    firstName: string;
-    lastName: string;
-    sub: string;
-    systemProviderRoles: string[];
-    extraGroups: string[];
-    issuer: string;
-    audience: string;
-    originalSessionExpiry?: number;
-  }
+interface JWT extends NextAuthJWT {
+  error?: "RefreshTokenError";
+  accessToken: string;
+  refreshToken: string;
+  idToken: string;
+  sessionId: string;
+  expiresAt: number;
+  refreshTokenExpires: number;
+  issuedAt: number;
+  authTime: number;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  profileAccess: string;
+  roles: string[];
+  username: string;
+  firstName: string;
+  lastName: string;
+  sub: string;
+  systemProviderRoles: string[];
+  extraGroups: string[];
+  issuer: string;
+  audience: string;
+  originalSessionExpiry?: number;
 }
 
 export const authConfig: NextAuthConfig = {
@@ -106,8 +105,7 @@ export const authConfig: NextAuthConfig = {
       // Handle session update event (e.g., when useSession().update() is called)
       if (trigger === "update") {
         console.log("JWT callback triggered by update event");
-        // You can add custom logic here for session updates
-        return { ...token };
+        return token as JWT;
       }
 
       // Initial sign in
@@ -144,53 +142,51 @@ export const authConfig: NextAuthConfig = {
         if (!keycloakProfile.iss) throw new Error("No issuer available");
         if (!keycloakProfile.aud) throw new Error("No audience available");
 
-        token.accessToken = account.access_token;
-        token.refreshToken = account.refresh_token;
-        token.idToken = account.id_token;
-        token.sessionId = keycloakProfile.sid;
+        const newToken: JWT = {
+          ...token as JWT,
+          accessToken: account.access_token,
+          refreshToken: account.refresh_token,
+          idToken: account.id_token,
+          sessionId: keycloakProfile.sid,
+          expiresAt: account.expires_at,
+          refreshTokenExpires: Math.floor(Date.now() / 1000) + (account.refresh_expires_in as number),
+          issuedAt: keycloakProfile.iat,
+          authTime: keycloakProfile.auth_time,
+          name: keycloakProfile.name,
+          email: keycloakProfile.email,
+          emailVerified: keycloakProfile.email_verified,
+          profileAccess: primaryGroup,
+          roles: appRoles,
+          username: keycloakProfile.preferred_username,
+          firstName: keycloakProfile.given_name,
+          lastName: keycloakProfile.family_name,
+          sub: keycloakProfile.sub,
+          systemProviderRoles: systemRoles,
+          extraGroups: remainingGroups,
+          issuer: keycloakProfile.iss,
+          audience: keycloakProfile.aud,
+        };
 
-        // Store timing information
-        token.expiresAt = account.expires_at;
-        token.refreshTokenExpires = Math.floor(Date.now() / 1000) + (account.refresh_expires_in as number);
-        token.issuedAt = keycloakProfile.iat;
-        token.authTime = keycloakProfile.auth_time;
-
-        // Store user information
-        token.name = keycloakProfile.name;
-        token.email = keycloakProfile.email;
-        token.emailVerified = keycloakProfile.email_verified;
-        token.profileAccess = primaryGroup;
-        token.roles = appRoles;
-        token.username = keycloakProfile.preferred_username;
-        token.firstName = keycloakProfile.given_name;
-        token.lastName = keycloakProfile.family_name;
-        token.sub = keycloakProfile.sub;
-
-        // Store extra information
-        token.systemProviderRoles = systemRoles;
-        token.extraGroups = remainingGroups;
-        token.issuer = keycloakProfile.iss;
-        token.audience = keycloakProfile.aud;
-
-        // Store original session expiry only on initial sign-in
-        if (!token.originalSessionExpiry) {
-          token.originalSessionExpiry = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60; // 30 days from first login
-          console.log("Setting initial session expiry to:", new Date(token.originalSessionExpiry * 1000).toISOString());
+        // Store original session expiry
+        if (!newToken.originalSessionExpiry) {
+          newToken.originalSessionExpiry = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60; // 30 days from first login
+          console.log("Setting initial session expiry to:", new Date(newToken.originalSessionExpiry * 1000).toISOString());
         }
 
-        return token as JWT;
+        return newToken;
       }
 
       // Token refresh logic - only run if not a trigger event
       if (!trigger) {
+        const typedToken = token as JWT;
         // Return previous token if the access token has not expired yet
-        if (Date.now() < token.expiresAt * 1000) {
-          return token;
+        if (Date.now() < typedToken.expiresAt * 1000) {
+          return typedToken;
         }
 
         console.log("Refreshing expired access token");
         try {
-          if (!token.refreshToken) throw new Error("No refresh token available");
+          if (!typedToken.refreshToken) throw new Error("No refresh token available");
 
           const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_KEYCLOAK_ISSUER}/protocol/openid-connect/token`, {
             method: 'POST',
@@ -201,8 +197,8 @@ export const authConfig: NextAuthConfig = {
               grant_type: 'refresh_token',
               client_id: process.env.NEXT_PUBLIC_AUTH_KEYCLOAK_ID!,
               client_secret: process.env.AUTH_KEYCLOAK_SECRET!,
-              refresh_token: token.refreshToken,
-            }),
+              refresh_token: typedToken.refreshToken,
+            }).toString(),
           });
 
           const tokens = await response.json();
@@ -210,58 +206,62 @@ export const authConfig: NextAuthConfig = {
           if (!response.ok) throw tokens;
 
           return {
-            ...token,
+            ...typedToken,
             accessToken: tokens.access_token,
-            refreshToken: tokens.refresh_token ?? token.refreshToken, // Keep old refresh token if not provided
-            idToken: tokens.id_token ?? token.idToken,
+            refreshToken: tokens.refresh_token ?? typedToken.refreshToken,
+            idToken: tokens.id_token ?? typedToken.idToken,
             expiresAt: Math.floor(Date.now() / 1000 + tokens.expires_in),
             refreshTokenExpires: Math.floor(Date.now() / 1000 + (tokens.refresh_expires_in ?? 0)),
           };
         } catch (error) {
           console.error("Error refreshing access token", error);
-          return { ...token, error: "RefreshTokenError" };
+          return { ...typedToken, error: "RefreshTokenError" };
         }
       }
+
+      return token as JWT;
     },
 
     async session({ session, token }) {
+      const typedToken = token as JWT;
+      const newSession = session as Session;
       // Use the original session expiry time if available
-      if (token.originalSessionExpiry) {
-        session.expires = new Date(token.originalSessionExpiry * 1000).toISOString();
+      if (typedToken.originalSessionExpiry) {
+        newSession.expires = new Date(typedToken.originalSessionExpiry * 1000).toISOString();
       }
 
       return {
-        ...session,
+        ...newSession,
         user: {
-          name: token.name,
-          email: token.email,
-          emailVerified: token.emailVerified,
-          profileAccess: token.profileAccess,
-          roles: token.roles,
-          username: token.username,
-          firstName: token.firstName,
-          lastName: token.lastName,
-          sub: token.sub,
+          name: typedToken.name,
+          email: typedToken.email,
+          emailVerified: typedToken.emailVerified,
+          profileAccess: typedToken.profileAccess,
+          roles: typedToken.roles,
+          username: typedToken.username,
+          firstName: typedToken.firstName,
+          lastName: typedToken.lastName,
+          sub: typedToken.sub,
         },
         tokens: {
-          accessToken: token.accessToken,
-          refreshToken: token.refreshToken,
-          idToken: token.idToken,
-          sessionId: token.sessionId,
+          accessToken: typedToken.accessToken,
+          refreshToken: typedToken.refreshToken,
+          idToken: typedToken.idToken,
+          sessionId: typedToken.sessionId,
         },
         timing: {
-          accessTokenExpiresAt: token.expiresAt,
-          refreshTokenExpiresAt: token.refreshTokenExpires,
-          issuedAt: token.issuedAt,
-          authTime: token.authTime,
+          accessTokenExpiresAt: typedToken.expiresAt,
+          refreshTokenExpiresAt: typedToken.refreshTokenExpires,
+          issuedAt: typedToken.issuedAt,
+          authTime: typedToken.authTime,
         },
         extra: {
-          systemProviderRoles: token.systemProviderRoles,
-          extraGroups: token.extraGroups,
-          issuer: token.issuer,
-          audience: token.audience,
+          systemProviderRoles: typedToken.systemProviderRoles,
+          extraGroups: typedToken.extraGroups,
+          issuer: typedToken.issuer,
+          audience: typedToken.audience,
         },
-        error: token.error,
+        error: typedToken.error,
       };
     },
   },

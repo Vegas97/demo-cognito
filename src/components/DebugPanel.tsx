@@ -64,7 +64,6 @@ function DebugSection({ title, data }: DebugSectionProps) {
           <JsonView 
             data={data as unknown as Record<string, unknown>} 
             style={{}}
-            className="bg-transparent text-current"
           />
         </div>
       )}
@@ -344,7 +343,6 @@ export function DebugPanel() {
                       data={session || {}} 
                       shouldExpandNode={shouldExpandNode}
                       style={{}}
-                      className="bg-transparent text-current"
                     />
                   </div>
                 </div>
