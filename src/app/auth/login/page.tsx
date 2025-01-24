@@ -8,8 +8,12 @@ export default function LoginPage() {
   const error = searchParams.get('error');
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
 
-  const handleSignIn = async () => {
+  const handleKeycloakSignIn = async () => {
     await signIn('keycloak', { callbackUrl });
+  };
+
+  const handleCognitoSignIn = async () => {
+    await signIn('cognito', { callbackUrl });
   };
 
   return (
@@ -23,12 +27,20 @@ export default function LoginPage() {
               <span className="block sm:inline">Your session has expired. Please sign in again.</span>
             </div>
           )}
-          <button
-            onClick={handleSignIn}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Sign in with Keycloak
-          </button>
+          <div className="space-y-3">
+            <button
+              onClick={handleKeycloakSignIn}
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Sign in with Keycloak
+            </button>
+            <button
+              onClick={handleCognitoSignIn}
+              className="w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 transition-colors"
+            >
+              Sign in with Cognito
+            </button>
+          </div>
         </div>
       </div>
     </div>

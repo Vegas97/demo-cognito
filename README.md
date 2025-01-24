@@ -17,6 +17,50 @@ This project demonstrates how to implement AWS Cognito authentication in a Next.
 2. Node.js 18+ installed
 3. A Cognito User Pool with an app client configured
 
+## Keycloak Server Setup (Docker)
+
+1. Create a Docker volume for persistent data:
+```bash
+docker volume create keycloak_data
+```
+
+2. Start Keycloak using Docker with persistent storage:
+```bash
+docker run -p 8080:8080 \
+  -e KEYCLOAK_ADMIN=admin \
+  -e KEYCLOAK_ADMIN_PASSWORD=admin \
+  -v keycloak_data:/opt/keycloak/data \
+  quay.io/keycloak/keycloak:latest \
+  start-dev --import-realm
+```
+
+```bash
+docker run -p 8080:8080 -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:26.1.0 start-dev
+```
+
+2. Access Admin Console:
+   - Open [http://localhost:8080](http://localhost:8080)
+   - Login to the admin console at [http://localhost:8080/admin](http://localhost:8080/admin)
+   - Use the following default credentials:
+     - Username: `admin`
+     - Password: `admin`
+
+Note: The above configuration includes data persistence through Docker volumes. For production environments, make sure to:
+- Use secure passwords
+- Enable HTTPS
+- Configure proper security settings
+- Consider using Docker Compose for more complex setups
+
+To completely reset Keycloak (if needed):
+```bash
+# Stop any running Keycloak container
+docker ps | grep keycloak | awk '{print $1}' | xargs docker stop
+
+# Remove the volume and recreate it
+docker volume rm keycloak_data
+docker volume create keycloak_data
+```
+
 ## Setup
 
 1. Clone the repository:

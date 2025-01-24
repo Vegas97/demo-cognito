@@ -1,5 +1,6 @@
 import { NextAuthConfig } from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
+import CognitoProvider from "next-auth/providers/cognito";
 import { Session } from "next-auth";
 import { JWT as NextAuthJWT } from "next-auth/jwt";
 
@@ -94,6 +95,11 @@ export const authConfig: NextAuthConfig = {
       clientSecret: process.env.AUTH_KEYCLOAK_SECRET!,
       issuer: process.env.NEXT_PUBLIC_AUTH_KEYCLOAK_ISSUER,
     }),
+    CognitoProvider({
+      clientId: process.env.NEXT_PUBLIC_AUTH_COGNITO_ID!,
+      clientSecret: process.env.AUTH_COGNITO_SECRET!,
+      issuer: process.env.NEXT_PUBLIC_AUTH_COGNITO_ISSUER,
+    })
   ],
   session: {
     strategy: "jwt",
