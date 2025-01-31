@@ -3,3 +3,9 @@ GUIDELINE[code_quality]:After making any code changes, automatically run the che
 ("typecheck": "tsc --noEmit",)
 ("check": "npm run lint || true && npm run typecheck")
 
+list of commands that you can run automatically:
+npm run check
+npm run lint
+npm run typecheck
+
+if you think that some commands should be added into the automatic one, ask me to add them in the memory or ask/suggest me to add in the config manually.
